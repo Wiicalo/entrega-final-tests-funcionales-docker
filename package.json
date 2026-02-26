@@ -1,0 +1,30 @@
+{
+  "name": "be3_77325",
+  "version": "1.0.0",
+  "description": "Backend 3 de Coderhouse",
+  "keywords": [
+    "Backend",
+    "Coderhouse"
+  ],
+  "homepage": "https://github.com/Drako01/be3_77325#readme",
+  "bugs": {
+    "url": "https://github.com/Drako01/be3_77325/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Drako01/be3_77325.git"
+  },
+  "license": "MIT",
+  "author": "Alejandro Di Stefano",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "5.2.1",
+    "dotenv": "17.3.1",
+    "commander": "14.0.3"
+  }
+}
