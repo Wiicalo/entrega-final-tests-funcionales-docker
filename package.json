@@ -20,15 +20,18 @@
   "main": "app.js",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "start": "node src/app.js --env prod",
-    "dev": "nodemon src/app.js --env local"
+    "start": "node app.js --env prod",
+    "dev": "nodemon app.js --env local",
+    "load:test": "artillery run src/test/artillery/test.yml"
   },
   "dependencies": {
     "express": "5.2.1",
     "dotenv": "17.3.1",
     "commander": "14.0.3",
     "compression": "1.8.1",
-    "@faker-js/faker": "10.3.0"
+    "@faker-js/faker": "10.3.0",
+    "artillery": "^2.0.23",
+    "winston": "3.19.0"
   },
   "devDependencies": {
     "nodemon": "3.1.14",
