@@ -1,110 +1,171 @@
-# BE3_77325 - Backend 3 (Node.js)
+# BE3_77325
 
-Aplicación backend educativa construida con Node.js, Express, `dotenv`, `commander` y `child_process.fork()`.
+API backend construida con Node.js y Express. El proyecto expone endpoints de verificacion, rutas para probar distintos niveles de logging con Winston y una ruta que genera usuarios ficticios en memoria con Faker.
 
-## Objetivo del proyecto
+## Stack actual
 
-Demostrar, en una app pequeña pero funcional, cómo integrar:
+- Node.js con ESM
+- Express 5
+- dotenv
+- Winston
+- @faker-js/faker
+- Jest + Supertest
+- Artillery
+- Docker
+- Kubernetes
 
-- Configuración por entorno (`.env.<env>`)
-- Argumentos de línea de comandos (`--env`)
-- API HTTP con Express
-- Uso de procesos hijo en Node.js
-
-## Stack
-
-- Node.js (ESM: `"type": "module"`)
-- Express `5.2.1`
-- dotenv `17.3.1`
-- commander `14.0.3`
-- nodemon (desarrollo)
-
-## Estructura del proyecto
+## Estructura actual
 
 ```text
 be3_77325/
-├─ app.js                    # Punto de entrada de la API
-├─ child.js                  # Script ejecutado como proceso hijo
-├─ argumentos.js             # Ejemplo didáctico de process.argv
-├─ .env.dev                  # Configuración dev (PORT, SECRET)
-├─ .env.local                # Configuración local (PORT, SECRET)
-├─ .env.prod                 # Configuración prod (PORT)
-├─ .env.qa                   # Configuración QA (PORT)
-├─ .env                      # Archivo extra (no usado por app.js directamente)
-├─ ejercicios/
-│  └─ ejercicios.md          # Guía práctica de ejercicios
-├─ teoria/
-│  └─ teoria.clase01.md      # Explicación teórica extendida
+├─ app.js
+├─ Dockerfile
+├─ docker-compose.yml
+├─ deployment.yaml
 ├─ package.json
+├─ .env
+├─ src/
+│  ├─ logs/
+│  │  ├─ logger.js
+│  │  └─ errors/
+│  ├─ server/
+│  │  └─ server.js
+│  ├─ services/
+│  │  └─ user.service.js
+│  ├─ test/
+│  │  ├─ app.test.js
+│  │  ├─ user.test.js
+│  │  ├─ users.service.stub.test.js
+│  │  └─ artillery/
+│  │     ├─ test.yml
+│  │     └─ resultado.md
+│  └─ teoria/
+│     └─ teoria.md
 └─ README.md
 ```
 
-## Arquitectura de la aplicación
+## Como funciona hoy
 
-### 1) Inicialización y configuración
+`app.js` solamente arranca el servidor definido en `src/server/server.js`.
 
-`app.js`:
+El servidor:
 
-1. Parsea CLI con `commander` (`--env`, default: `dev`).
-2. Valida que el entorno esté en: `local | dev | prod | qa`.
-3. Construye el archivo a cargar: `.env.<env>`.
-4. Verifica existencia del archivo con `fs.existsSync`.
-5. Carga variables con `dotenv.config({ path })`.
-6. Resuelve `PORT` (`Number(process.env.PORT)`, fallback `3000`).
-7. Resuelve `SECRET` (`process.env.SECRET`, fallback `"Secreto"`).
+- carga variables de entorno desde `.env`
+- crea una API Express con soporte para JSON
+- registra un middleware de auditoria para loguear cada request
+- expone rutas de prueba para distintos niveles de log
+- genera usuarios fake en memoria en `GET /users`
 
-### 2) Capa HTTP (Express)
+## Variables de entorno
 
-Rutas expuestas:
+El repo hoy incluye este archivo `.env`:
 
-- `GET /` -> health simple (`"Hola desde Node.!"`)
-- `GET /secreto` -> devuelve el secreto activo del entorno
-- `GET /child` -> crea proceso hijo y responde con su mensaje
-
-### 3) Capa de procesos
-
-- `fork()` ejecuta `child.js` en otro proceso Node.
-- El hijo envía datos al padre por IPC con `process.send(...)`.
-- El padre escucha `message`, `error` y `exit`.
-
-## Flujo de `GET /child` (Mermaid)
-
-```mermaid
-sequenceDiagram
-    participant Cliente
-    participant Padre as app.js (Express)
-    participant Hijo as child.js
-
-    Cliente->>Padre: GET /child
-    Padre->>Padre: resolve(__dirname, "./child.js")
-    Padre->>Hijo: fork(childPath)
-    Hijo-->>Padre: process.send("Hola desde el Proceso Hijo!")
-    Padre-->>Cliente: 200 OK + "Mensaje del proceso hijo: ..."
-    Hijo-xPadre: exit(code)
+```env
+PORT=5000
+USERS_COUNT=30
+NODE_ENV=production
+LOG_LEVEL=info
 ```
 
-## Cómo funciona la app actualmente
+Variables usadas por la aplicacion:
 
-### Comportamiento real del arranque
+- `PORT`: puerto HTTP del servidor. Si no existe, usa `3000`.
+- `USERS_COUNT`: cantidad de usuarios que devuelve `GET /users`. Si no existe, usa `5`.
+- `NODE_ENV`: hoy se define en el entorno, pero no altera logica interna.
+- `LOG_LEVEL`: hoy se define en entorno y manifests, pero el logger actual queda fijado en `debug`.
 
-- El script `npm run dev` ejecuta: `nodemon app.js --env local`
-  - Carga `.env.local` (actualmente `PORT=8001`, `SECRET=...`)
-- El script `npm start` ejecuta: `node app.js --env prod`
-  - Carga `.env.prod` (actualmente `PORT=80`)
+## Endpoints disponibles
 
-### Notas de funcionamiento actual
+### `GET /`
 
-- Si `--env` no es válido, la app termina con error.
-- Si no existe `.env.<env>`, la app termina con error.
-- Si `PORT` no es numérico, hoy se loguea error, pero el proceso no hace `exit`.
-- El archivo `.env` base existe, pero `app.js` usa explícitamente `.env.<env>`.
-- `/secreto` muestra `SECRET` (no `SECRETO`); si falta, usa `"Secreto"`.
+Devuelve estado basico del servidor y el PID del proceso:
 
-## Ejecución local
+```json
+{
+  "message": "Servidor funcionando correctamente",
+  "pid": 12345
+}
+```
+
+### `GET /debug`
+
+Responde:
+
+```text
+Mensaje de Debug
+```
+
+### `GET /warn`
+
+Responde:
+
+```text
+Mensaje de Advertencia
+```
+
+### `GET /error`
+
+Responde:
+
+```text
+Mensaje de Error
+```
+
+### `GET /fatal`
+
+Responde:
+
+```text
+Mensaje de Error Fatal
+```
+
+### `GET /test`
+
+Responde:
+
+```text
+Mensaje de Test
+```
+
+### `GET /users`
+
+Genera usuarios ficticios en memoria usando Faker. La cantidad depende de `USERS_COUNT`.
+
+Ejemplo de respuesta:
+
+```json
+[
+  {
+    "id": "a8e3c8b2-1d8d-4d53-9d43-2d2f0f4d2e74",
+    "name": "Juan Perez",
+    "email": "juan@example.com"
+  }
+]
+```
+
+## Logging
+
+El logger esta implementado con Winston y define niveles personalizados:
+
+- `fatal`
+- `error`
+- `warn`
+- `info`
+- `http`
+- `debug`
+
+Los logs se escriben en consola y tambien en archivos dentro de `src/logs/errors/`:
+
+- `combined.log`
+- `errors.log`
+- `fatals.log`
+- `warnings.log`
+
+## Ejecucion local
 
 ### Requisitos
 
-- Node.js 18+ recomendado
+- Node.js 18 o superior
 - npm
 
 ### Instalar dependencias
@@ -113,67 +174,129 @@ sequenceDiagram
 npm install
 ```
 
-### Modo desarrollo
-
-```bash
-npm run dev
-```
-
-### Modo producción
+### Iniciar la app
 
 ```bash
 npm start
 ```
 
-### Ejecutar con entorno manual
+Con el `.env` actual, la aplicacion queda disponible en:
+
+```text
+http://localhost:5000
+```
+
+### Desarrollo con reinicio automatico
 
 ```bash
-node app.js --env local
-node app.js --env dev
-node app.js --env qa
-node app.js --env prod
-```
-
-## API actual
-
-### `GET /`
-
-Respuesta:
-
-```text
-Hola desde Node.!
-```
-
-### `GET /secreto`
-
-Respuesta:
-
-```text
-Mi Secreto es: "<valor de SECRET>"
-```
-
-### `GET /child`
-
-Respuesta:
-
-```text
-Mensaje del proceso hijo: "Hola desde el Proceso Hijo!"
+npm run dev
 ```
 
 ## Scripts disponibles
 
 ```json
 {
+  "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
   "start": "node app.js --env prod",
   "dev": "nodemon app.js --env local",
-  "test": "echo \"Error: no test specified\" && exit 1"
+  "load:test": "artillery run src/test/artillery/test.yml"
 }
 ```
 
-## Material de apoyo incluido
+## Testing
 
-- `teoria/teoria.clase01.md`: desarrollo teórico detallado.
-- `ejercicios/ejercicios.md`: prácticas guiadas por tema.
+El proyecto incluye:
+
+- tests unitarios para `generateFakerUsers`
+- tests HTTP con Supertest
+- prueba de carga con Artillery sobre `GET /test`
+
+### Jest
+
+```bash
+npm test
+```
+
+Estado actual del repo:
+
+- existe una suite que pasa: `src/test/users.service.stub.test.js`
+- hoy `npm test` falla porque hay tests que intentan importar `../app` o `../app.js` desde `src/test`, pero ese modulo no existe en esa ubicacion actual del proyecto
+
+### Artillery
+
+```bash
+npm run load:test
+```
+
+La configuracion actual en `src/test/artillery/test.yml` apunta a:
+
+```text
+http://localhost:5000/test
+```
+
+y ejecuta una fase de 10 segundos con `arrivalRate: 10`.
+
+## Docker
+
+### Build de imagen
+
+```bash
+docker build -t be3_77325:latest .
+```
+
+### Ejecutar con Docker Compose
+
+```bash
+docker compose up --build
+```
+
+Configuracion actual:
+
+- imagen basada en `node:20-alpine`
+- puerto expuesto `3000`
+- volumen para persistir logs: `./src/logs:/app/src/logs`
+
+Con `docker-compose.yml`, la app queda publicada en:
+
+```text
+http://localhost:3000
+```
+
+## Kubernetes
+
+El archivo `deployment.yaml` incluye:
+
+- un `Deployment` con 2 replicas
+- un `Service` de tipo `ClusterIP`
+- contenedor escuchando en puerto `3000`
+
+Antes de desplegar, hay que reemplazar la imagen placeholder:
+
+```text
+tu-usuario/be3-77325:latest
+```
+
+Aplicacion:
+
+```bash
+kubectl apply -f deployment.yaml
+```
+
+## Estado actual del proyecto
+
+El repo ya tiene:
+
+- servidor Express funcional
+- rutas de logging y diagnostico
+- generacion de usuarios fake en memoria
+- contenedorizacion con Docker
+- manifiesto base para Kubernetes
+
+Pendientes o inconsistencias actuales:
+
+- los scripts `start` y `dev` siguen pasando `--env`, pero la app actual no procesa argumentos CLI
+- `compression` y `commander` figuran en dependencias historicas, pero no se usan en el codigo actual
+- la suite completa de Jest no esta verde
 
 ## Licencia
 
