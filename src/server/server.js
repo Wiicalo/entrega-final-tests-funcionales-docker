@@ -72,4 +72,14 @@ app.get('/users', (req, res) => {
 })
 
 
-export default app;
+const rawPort = process.env.PORT;
+const PORT = rawPort ? Number(rawPort) : 3000;
+
+if (Number.isNaN(PORT)) {
+    logger.error(`PORT invalido en ${envFilePath}; "${rawPort}"`)
+}
+
+
+export function startServer() {
+    app.listen(PORT, () => { logger.info(`Escuchando en http://localhost:${PORT}`) });
+};
