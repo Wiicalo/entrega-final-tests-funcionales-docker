@@ -46,8 +46,8 @@ export class UserService {
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-
-        return { token, user: { id: user.id, username: user.username, email: user.email } }
+        const message = `Bienvenido ${user.username}`;
+        return { message, token, user: { id: user.id, username: user.username, email: user.email } }
 
     }
 }

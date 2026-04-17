@@ -1,7 +1,7 @@
 import { User } from "../models/user.model.js";
 import { randomUUID } from 'crypto';
 
-const users = [];
+const users = []; // Esto es un Array
 
 export class UserRepository {
     findAll() {
