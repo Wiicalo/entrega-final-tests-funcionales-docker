@@ -2,6 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { spawn } from "child_process";
 import { resolve } from "path";
 
+type CalculationOperation = 'sum' | 'multiply';
+
 @Injectable()
 export class ToolsService {
     getConfigInfo() {
@@ -20,14 +22,30 @@ export class ToolsService {
         };
     }
 
-    async calculateWithChild(numbers: number[]) {
+    normalizeOperation(operation?: string): CalculationOperation {
+        if (!operation) {
+            return process.env.OPERATION === 'multiply' ? 'multiply' : 'sum';
+        }
+
+        if (operation === 'mul' || operation === 'multiply') {
+            return 'multiply';
+        }
+
+        return 'sum';
+    }
+
+    async calculateWithChild(numbers: number[], operation?: string) {
         const scriptPath = resolve(process.cwd(), 'scripts', 'calc-child.js');
+        const normalizedOperation = this.normalizeOperation(operation);
 
         return new Promise((resolvePromise, rejectPromise) => {
             // Lanzamos un proceso aparte para separar responsabilidades.
 
             const child = spawn(process.execPath, [scriptPath, ...numbers.map(String)], {
-                env: process.env,
+                env: {
+                    ...process.env,
+                    OPERATION: normalizedOperation,
+                },
             });
 
             let stdout = '';

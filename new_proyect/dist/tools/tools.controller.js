@@ -25,7 +25,7 @@ let ToolsController = class ToolsController {
     getProcessInfo() {
         return this.toolsService.getProcessInfo();
     }
-    async calculate(numbersQuery) {
+    async calculate(numbersQuery, operation) {
         if (!numbersQuery) {
             throw new common_1.BadRequestException('Debes enviar numbers. Ejemplo: ?numbers=2,3,4,5');
         }
@@ -33,7 +33,7 @@ let ToolsController = class ToolsController {
         if (numbers.some((value) => Number.isNaN(value))) {
             throw new common_1.BadRequestException('Todos los valores en numbers deben ser numericos.');
         }
-        return this.toolsService.calculateWithChild(numbers);
+        return this.toolsService.calculateWithChild(numbers, operation);
     }
 };
 exports.ToolsController = ToolsController;
@@ -52,8 +52,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)('calculate'),
     __param(0, (0, common_1.Query)('numbers')),
+    __param(1, (0, common_1.Query)('operation')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], ToolsController.prototype, "calculate", null);
 exports.ToolsController = ToolsController = __decorate([

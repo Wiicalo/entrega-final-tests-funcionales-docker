@@ -12,7 +12,7 @@ if(hasInvalidNumber){
 
 let result = 0;
 
-if(operation === 'mul') {
+if(operation === 'mul' || operation === 'multiply') {
     result = numbers.reduce((acc, val) => acc * val, 1);
 } else {
     result = numbers.reduce((acc, val) => acc + val, 0);

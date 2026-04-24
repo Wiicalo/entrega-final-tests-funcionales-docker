@@ -25,12 +25,25 @@ let ToolsService = class ToolsService {
             argv: process.argv,
         };
     }
-    async calculateWithChild(numbers) {
-        const scriptPath = (0, path_1.resolve)(process.cwd(), 'scripts', 'cal-child.js');
+    normalizeOperation(operation) {
+        if (!operation) {
+            return process.env.OPERATION === 'multiply' ? 'multiply' : 'sum';
+        }
+        if (operation === 'mul' || operation === 'multiply') {
+            return 'multiply';
+        }
+        return 'sum';
+    }
+    async calculateWithChild(numbers, operation) {
+        const scriptPath = (0, path_1.resolve)(process.cwd(), 'scripts', 'calc-child.js');
+        const normalizedOperation = this.normalizeOperation(operation);
         return new Promise((resolvePromise, rejectPromise) => {
             // Lanzamos un proceso aparte para separar responsabilidades.
             const child = (0, child_process_1.spawn)(process.execPath, [scriptPath, ...numbers.map(String)], {
-                env: process.env,
+                env: {
+                    ...process.env,
+                    OPERATION: normalizedOperation,
+                },
             });
             let stdout = '';
             let stderr = '';

@@ -16,7 +16,10 @@ export class ToolsController {
     }
 
     @Get('calculate')
-    async calculate(@Query('numbers') numbersQuery?: string) {
+    async calculate(
+        @Query('numbers') numbersQuery?: string,
+        @Query('operation') operation?: string,
+    ) {
         if(!numbersQuery){
             throw new BadRequestException('Debes enviar numbers. Ejemplo: ?numbers=2,3,4,5');
         }
@@ -27,6 +30,6 @@ export class ToolsController {
             throw new BadRequestException('Todos los valores en numbers deben ser numericos.')
         }
 
-        return this.toolsService.calculateWithChild(numbers);
+        return this.toolsService.calculateWithChild(numbers, operation);
     }
 }
