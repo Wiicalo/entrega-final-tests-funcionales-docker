@@ -5,9 +5,12 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "ts-node --transpile-only src/main.ts",
+    "start":  "node dist/main.js",
     "start:dev": "ts-node --transpile-only src/main.ts",
     "start:prod": "node dist/main.js"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "keywords": [],
   "author": "",

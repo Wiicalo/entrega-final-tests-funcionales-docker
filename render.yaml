@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: be3-77325-backend
+    env: node
+    plan: free
+    branch: clase_08
+    buildCommand: cd new_proyect && npm ci && npm run build && npm prune --omit=dev
+    startCommand: cd new_proyect && npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+    autoDeployTrigger: commit
