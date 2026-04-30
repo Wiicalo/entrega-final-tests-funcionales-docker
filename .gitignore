@@ -1,0 +1,6 @@
+new_proyect
+node_modules
+.env
+logs/*
+*/logs/*
+*/**/logs/*

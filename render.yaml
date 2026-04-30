@@ -1,14 +1,18 @@
 services:
   - type: web
-    name: be3-77325-backend
+    name: be3-77325-backend-app
     env: node
     plan: free
-    branch: clase_08
-    rootDir: new_proyect
-    buildCommand: npm ci --include=dev && npm run build && npm prune --omit=dev
-    startCommand: npm run start:prod
-    healthCheckPath: /api
+    buildCommand: npm ci --omit:dev
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
-    autoDeployTrigger: commit
+      - key: JWT_SECRET
+        value: MiClaveUltraMegaSecreta
+      - key: LOG_LEVEL
+        value: info
+      - key: USERS_COUNT
+        value: 30
+    autoDeploy: true
+    branch: clase_08_a

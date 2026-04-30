@@ -1,0 +1,45 @@
+{
+    "name": "be3_77325",
+    "version": "1.0.0",
+    "description": "Backend 3 de Coderhouse",
+    "keywords": [
+        "Backend",
+        "Coderhouse"
+    ],
+    "engines": {
+        "node": ">=20"
+    },
+    "homepage": "https://github.com/Drako01/be3_77325#readme",
+    "bugs": {
+        "url": "https://github.com/Drako01/be3_77325/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Drako01/be3_77325.git"
+    },
+    "license": "MIT",
+    "author": "Alejandro Di Stefano",
+    "type": "module",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js",
+        "dev": "nodemon app.js",
+        "test": "mocha --recursive src/test/**/*.test.js"
+    },
+    "dependencies": {
+        "express": "5.2.1",
+        "dotenv": "17.3.1",
+        "winston": "3.19.0",
+        "bcryptjs": "3.0.3",
+        "express-validator": "7.3.2",
+        "jsonwebtoken": "9.0.3",
+        "swagger-jsdoc": "6.2.8",
+        "swagger-ui-express": "5.0.1"
+    },
+    "devDependencies": {
+        "nodemon": "3.1.14",
+        "mocha": "11.7.5",
+        "chai": "6.2.2",
+        "supertest": "7.2.2"
+    }
+}
