@@ -4,8 +4,10 @@ services:
     env: node
     plan: free
     branch: clase_08
-    buildCommand: cd new_proyect && npm ci && npm run build && npm prune --omit=dev
-    startCommand: cd new_proyect && npm run start:prod
+    rootDir: new_proyect
+    buildCommand: npm ci && npm run build && npm prune --omit=dev
+    startCommand: npm run start:prod
+    healthCheckPath: /api
     envVars:
       - key: NODE_ENV
         value: production
