@@ -1,234 +1,168 @@
-# BE3_77325
+# BE3_77325 - Tests funcionales y Docker
 
-Proyecto simple en NestJS para practicar dos bloques:
+Proyecto backend en Express con pruebas funcionales para el router de adopciones y configuracion Docker para ejecutar la API en contenedor.
 
-- autenticacion y autorizacion con un token simulado
-- variables de entorno, `process.argv` y `child_process`
+## Links
 
-La aplicacion esta dentro de la carpeta [new_proyect](./new_proyect).
+- Repositorio: `https://github.com/Wiicalo/be3_77325-adoptions`
+- Imagen DockerHub: `https://hub.docker.com/r/wiicalo/be3_77325-adoptions`
+- Imagen: `wiicalo/be3_77325-adoptions:1.0.0`
 
 ## Requisitos
 
 - Node.js 20 o superior
 - npm
+- Docker Desktop
 
-## Clonar e instalar
-
-```bash
-git clone <URL_DEL_REPOSITORIO>
-cd be3_77325/new_proyect
-npm install
-```
-
-## Configuracion
-
-Crear el archivo `.env` a partir de `.env.example`.
-
-### PowerShell
-
-```powershell
-Copy-Item .env.example .env
-```
-
-### Git Bash / Linux / macOS
+## Instalacion
 
 ```bash
-cp .env.example .env
+npm ci
 ```
 
-Contenido esperado:
-
-```env
-PORT=5000
-APP_NAME="Clase 07 NestJS Demo"
-OPERATION=sum
-```
-
-Variables:
-
-- `PORT`: puerto del servidor
-- `APP_NAME`: nombre visible de la app
-- `OPERATION`: operacion por defecto del proceso hijo. Puede ser `sum` o `multiply`
-
-## Ejecutar el proyecto
-
-### Modo desarrollo
+## Ejecutar la API
 
 ```bash
-npm run start
+npm start
 ```
 
-### Compilar
+Por defecto se levanta en:
+
+```text
+http://localhost:3000
+```
+
+Tambien se puede indicar un puerto:
 
 ```bash
-npm run build
+PORT=5050 npm start
 ```
 
-La API queda disponible en:
+## Endpoints
+
+Adopciones:
+
+- `GET /api/adoptions`
+- `GET /api/adoptions/:aid`
+- `POST /api/adoptions/:uid/:pid`
+
+Usuarios:
+
+- `GET /api/users/`
+- `POST /api/users/`
+- `POST /api/users/login`
+- `GET /api/users/profile`
+
+## Tests
+
+Los tests funcionales de adopciones estan en:
 
 ```text
-http://localhost:5000/api
+src/test/adoption.route.test.js
 ```
 
-Si cambias `PORT` en `.env`, cambia tambien la URL.
+Casos cubiertos:
 
-## Que hace el proyecto
+- listado de adopciones
+- busqueda por id
+- adopcion inexistente
+- validacion de parametros
+- creacion de adopcion
+- usuario inexistente
+- mascota inexistente
+- mascota ya adoptada
+- error del repositorio
 
-### 1. Autenticacion y autorizacion
+Ejecutar:
 
-El proyecto no usa JWT real firmado. Usa un token simple en base64 que representa un JSON como este:
-
-```json
-{ "username": "alice", "role": "admin" }
+```bash
+npm test
 ```
 
-Hay dos guards:
-
-- `FakeJwtGuard`: valida el token y deja el usuario autenticado en la request
-- `RouteAccessGuard`: revisa si el rol puede entrar a la ruta pedida
-
-Reglas:
-
-- `admin`: puede entrar a todas las rutas
-- `user`: solo puede entrar a rutas que empiecen con `/api/user`
-
-### 2. Herramientas de Node.js
-
-La parte `tools` muestra tres conceptos:
-
-- `process.env`
-- `process.argv`
-- `child_process`
-
-El endpoint de calculo no resuelve la operacion en el proceso principal. Lanza un proceso hijo y le pasa los numeros por argumentos.
-
-## Endpoints principales
-
-### `GET /api`
-
-Muestra una respuesta simple con las rutas principales del proyecto.
-
-### `GET /api/auth/demo-token?username=alice&role=admin`
-
-Genera un token de prueba para usar en rutas protegidas.
-
-### `GET /api/user/profile`
-
-Ruta protegida. Acepta token con rol `user` o `admin`.
-
-### `GET /api/admin/dashboard`
-
-Ruta protegida. Solo acepta token con rol `admin`.
-
-### `GET /api/tools/config`
-
-Devuelve la configuracion principal tomada desde variables de entorno.
-
-### `GET /api/tools/process-info`
-
-Devuelve informacion del proceso actual:
-
-- `pid`
-- `nodeVersion`
-- `argv`
-
-### `GET /api/tools/calculate?numbers=2,3,4`
-
-Ejecuta el proceso hijo y devuelve el resultado usando la operacion definida en `.env`.
-
-### `GET /api/tools/calculate?numbers=2,3,4,5,9,12&operation=mul`
-
-Ejecuta el proceso hijo y fuerza multiplicacion para esa request.
-
-Valores aceptados para `operation`:
-
-- `sum`
-- `mul`
-- `multiply`
-
-## Como probar la autenticacion
-
-### 1. Obtener un token
-
-Abrir:
+Resultado:
 
 ```text
-http://localhost:5000/api/auth/demo-token?username=bob&role=user
+21 passing (3s)
 ```
 
-Copiar el valor `token`.
+## Docker
 
-### 2. Usarlo en una ruta protegida
+Construir la imagen:
 
-Hacer una request a:
+```bash
+docker build -t wiicalo/be3_77325-adoptions:1.0.0 .
+```
+
+Ejecutar el contenedor:
+
+```bash
+docker run --name be3-adoptions -p 5050:5050 --env PORT=5050 wiicalo/be3_77325-adoptions:1.0.0
+```
+
+Probar el endpoint:
+
+```bash
+curl http://localhost:5050/api/adoptions
+```
+
+Subir la imagen:
+
+```bash
+docker login
+docker push wiicalo/be3_77325-adoptions:1.0.0
+```
+
+Escaneo basico:
+
+```bash
+npm audit --omit=dev --audit-level=moderate
+```
+
+Resultado:
 
 ```text
-GET http://localhost:5000/api/user/profile
+found 0 vulnerabilities
 ```
 
-Con este header:
+## Dockerfile
+
+El Dockerfile usa `node:22-alpine`, instala dependencias con `npm ci --omit=dev` y ejecuta la aplicacion con el usuario `node`. Tambien se usa `.dockerignore` para no copiar dependencias locales, logs, `.git` ni archivos de test al contenedor.
+
+## Estructura
 
 ```text
-Authorization: Bearer TU_TOKEN
-```
-
-### 3. Probar permisos
-
-Con token `user`:
-
-- `/api/user/profile` -> permitido
-- `/api/admin/dashboard` -> rechazado
-
-Con token `admin`:
-
-- `/api/user/profile` -> permitido
-- `/api/admin/dashboard` -> permitido
-
-## Como probar el calculo
-
-### Suma
-
-```text
-http://localhost:5000/api/tools/calculate?numbers=2,3,4
-```
-
-### Multiplicacion
-
-```text
-http://localhost:5000/api/tools/calculate?numbers=2,3,4,5,9,12&operation=mul
-```
-
-Si quieres que la operacion por defecto sea multiplicacion, cambia el `.env` a:
-
-```env
-OPERATION=multiply
-```
-
-## Estructura del proyecto
-
-```text
-be3_77325/
-|-- new_proyect/
-|   |-- scripts/
-|   |   `-- calc-child.js
-|   |-- src/
-|   |   |-- auth/
-|   |   |   |-- guards/
-|   |   |   |   |-- fake-jwt.guard.ts
-|   |   |   |   `-- route-access.guard.ts
-|   |   |   |-- auth.controller.ts
-|   |   |   |-- auth.module.ts
-|   |   |   `-- auth.service.ts
-|   |   |-- tools/
-|   |   |   |-- tools.controller.ts
-|   |   |   |-- tools.module.ts
-|   |   |   `-- tools.service.ts
-|   |   |-- app.controller.ts
-|   |   |-- app.module.ts
-|   |   `-- main.ts
-|   |-- .env.example
-|   |-- package.json
-|   `-- tsconfig.json
-|-- LICENCE
-`-- README.md
+.
+|-- Dockerfile
+|-- README.md
+|-- app.js
+|-- docker-compose.yml
+|-- package.json
+|-- src
+|   |-- config
+|   |-- controllers
+|   |   |-- adoptions.controller.js
+|   |   `-- user.controller.js
+|   |-- docs
+|   |-- middleware
+|   |-- models
+|   |   |-- adoption.model.js
+|   |   |-- pet.model.js
+|   |   `-- user.model.js
+|   |-- repositories
+|   |   |-- adoption-user.repository.js
+|   |   |-- adoption.repository.js
+|   |   |-- pet.repository.js
+|   |   `-- user.repository.js
+|   |-- routes
+|   |   |-- adoption.router.js
+|   |   `-- user.router.js
+|   |-- server
+|   |-- services
+|   |   |-- adoption.service.js
+|   |   `-- user.service.js
+|   `-- test
+|       |-- adoption.route.test.js
+|       |-- user.route.test.js
+|       `-- user.service.test.js
+`-- new_proyect
 ```

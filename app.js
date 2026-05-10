@@ -1,4 +1,10 @@
-import { startServer } from './src/server/server.js'
+import { fileURLToPath } from 'url';
+import app, { startServer } from './src/server/server.js';
 
+const isDirectExecution = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
 
-startServer();
+if (isDirectExecution) {
+    startServer();
+}
+
+export default app;

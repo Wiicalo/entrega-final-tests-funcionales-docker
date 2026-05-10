@@ -21,8 +21,8 @@ const router = new Router();
  *                 $ref: '#/components/schemas/User'
  *             example:
  *               - id: "1"
- *                 name: "Alejandro"
- *                 email: "alejandro@email.com"
+ *                 name: "Usuario Demo"
+ *                 email: "demo@email.com"
  *       '500':
  *         description: Error servidor
  *         content:

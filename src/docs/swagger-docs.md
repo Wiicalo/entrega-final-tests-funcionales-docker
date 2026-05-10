@@ -27,6 +27,9 @@ npm install swagger-jsdoc swagger-ui-express
 - POST /api/users/ : Crear usuario (ejemplo en docs).
 - POST /api/users/login : Obtener JWT token.
 - GET /api/users/profile : Perfil (requiere Authorization: Bearer <token>).
+- GET /api/adoptions : Lista adopciones.
+- GET /api/adoptions/:aid : Obtiene una adopcion por id.
+- POST /api/adoptions/:uid/:pid : Crea una adopcion.
 
 ## Personalización
 

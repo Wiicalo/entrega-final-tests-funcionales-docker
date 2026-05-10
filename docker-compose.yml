@@ -12,5 +12,5 @@ services:
       PORT: 5050
       LOG_LEVEL: info
     volumes:
-      - ./src/logs:/app/logs
+      - ./src/logs:/app/src/logs
     restart: unless-stopped

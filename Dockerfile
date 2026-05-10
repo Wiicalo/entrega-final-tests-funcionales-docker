@@ -1,24 +1,27 @@
-# Imagen base de node para que Render pueda utilizar en el deploy
+FROM node:22-alpine AS deps
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit:dev
+RUN npm cache clean --force
+
 FROM node:22-alpine
 
 WORKDIR /app
 
-
-COPY package*.json ./
-
-# En produccion instalamos solo dependencias que no sean devDependencies
-RUN npm ci --omit:dev
-
-COPY . .
-
-
-RUN mkdir -p src/logs/errors
-
-# El contenedor expone el puerto interno, Render lo inyecta en runtime
-EXPOSE 5050
-
-
 ENV NODE_ENV=production
 ENV PORT=5050
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --chown=node:node package*.json ./
+COPY --chown=node:node app.js ./
+COPY --chown=node:node src ./src
+
+RUN mkdir -p src/logs/errors && chown -R node:node /app
+
+USER node
+
+EXPOSE 5050
 
 CMD [ "npm", "start" ]

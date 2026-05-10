@@ -1,5 +1,5 @@
 {
-    "name": "be3_77325",
+    "name": "be3_77325-adoptions",
     "version": "1.0.0",
     "description": "Backend 3 de Coderhouse",
     "keywords": [
@@ -9,16 +9,16 @@
     "engines": {
         "node": ">=20"
     },
-    "homepage": "https://github.com/Drako01/be3_77325#readme",
+    "homepage": "https://github.com/Wiicalo/be3_77325-adoptions#readme",
     "bugs": {
-        "url": "https://github.com/Drako01/be3_77325/issues"
+        "url": "https://github.com/Wiicalo/be3_77325-adoptions/issues"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Drako01/be3_77325.git"
+        "url": "git+https://github.com/Wiicalo/be3_77325-adoptions.git"
     },
     "license": "MIT",
-    "author": "Alejandro Di Stefano",
+    "author": "Wiicalo",
     "type": "module",
     "main": "app.js",
     "scripts": {
