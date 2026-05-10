@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: be3-77325-backend-app
+    name: be3-77325-adoptions
     env: node
     plan: free
     buildCommand: npm ci --omit:dev
@@ -15,4 +15,4 @@ services:
       - key: USERS_COUNT
         value: 30
     autoDeploy: true
-    branch: clase_08_a
+    branch: main

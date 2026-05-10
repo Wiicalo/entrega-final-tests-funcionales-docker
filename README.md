@@ -164,5 +164,4 @@ El Dockerfile usa `node:22-alpine`, instala dependencias con `npm ci --omit=dev`
 |       |-- adoption.route.test.js
 |       |-- user.route.test.js
 |       `-- user.service.test.js
-`-- new_proyect
 ```

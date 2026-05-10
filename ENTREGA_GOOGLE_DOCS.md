@@ -34,7 +34,6 @@ El proyecto esta organizado por responsabilidades. Las rutas estan separadas de 
 |       |-- adoption.route.test.js
 |       |-- user.route.test.js
 |       `-- user.service.test.js
-`-- new_proyect
 ```
 
 Descripcion de carpetas:
@@ -45,7 +44,6 @@ Descripcion de carpetas:
 - `src/repositories`: maneja los datos usados por la aplicacion y las pruebas.
 - `src/models`: define la forma de los objetos principales.
 - `src/test`: contiene las pruebas funcionales y unitarias.
-- `new_proyect`: carpeta incluida en el repositorio original, sin cambios para esta entrega.
 
 ## Tests funcionales
 
